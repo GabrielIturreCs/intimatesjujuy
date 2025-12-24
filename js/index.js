@@ -1,164 +1,219 @@
 
-// --- DATA ---
+// --- PRODUCT DATA ---
 const products = [
-    { id: 1, name: 'Imperial Premium', category: 'Mates', price: 28500, image: 'images/banana_mate.png', badge: 'Best Seller' },
-    { id: 2, name: 'Canarias 1kg', category: 'Yerbas', price: 8500, image: 'images/banana_yerba.png' },
-    { id: 3, name: 'Stanley 1.4L', category: 'Termos', price: 105000, image: 'images/banana_thermo.png' },
-    { id: 4, name: 'Bombilla Alpaca', category: 'Accesorios', price: 9200, image: 'images/banana_bombilla.png' },
-    { id: 5, name: 'Camionero Algarrobo', category: 'Mates', price: 19500, image: 'images/banana_mate_camionero.png' },
-    { id: 6, name: 'Mochila Matera', category: 'Accesorios', price: 45000, image: 'images/banana_accessories.png', badge: 'Nuevo' },
+    {
+        id: 1,
+        name: 'Imperial Cincelado',
+        category: 'Mates',
+        price: 32500,
+        image: 'images/banana_mate.png',
+        badge: 'Top Choice',
+        desc: 'Alpaca y Cuero Vaqueta'
+    },
+    {
+        id: 2,
+        name: 'Canarias Edición Oro',
+        category: 'Yerbas',
+        price: 9800,
+        image: 'images/banana_yerba.png',
+        desc: 'Estacionamiento 24 Meses'
+    },
+    {
+        id: 3,
+        name: 'Stanley Classic 1.4L',
+        category: 'Termos',
+        price: 112000,
+        image: 'images/banana_thermo.png',
+        desc: 'Aislamiento Térmico Pro'
+    },
+    {
+        id: 4,
+        name: 'Bombilla Pico Loro',
+        category: 'Accesorios',
+        price: 12500,
+        image: 'images/banana_bombilla.png',
+        desc: 'Alpaca Maciza'
+    },
+    {
+        id: 5,
+        name: 'Torpedo Forrado',
+        category: 'Mates',
+        price: 24500,
+        image: 'images/banana_mate_camionero.png',
+        desc: 'Cuero Crudo'
+    },
+    {
+        id: 6,
+        name: 'Mochila Cordura',
+        category: 'Accesorios',
+        price: 48000,
+        image: 'images/banana_accessories.png',
+        badge: 'Nuevo',
+        desc: 'Interior Impermeable'
+    },
 ];
 
-let cartCount = 0;
-
-// --- LOGIC ---
+const reviews = [
+    { name: "Carlos Perez", avatar: "https://i.pravatar.cc/150?u=carlos", text: "Excelente calidad, el mate imperial es una joya. El envío a Buenos Aires llegó perfecto.", rating: 5, time: "hace 2 semanas" },
+    { name: "Sofia Gimenez", avatar: "https://i.pravatar.cc/150?u=sofia", text: "La mejor yerba que probé en años. El estacionamiento natural se nota mucho.", rating: 5, time: "hace 1 mes" },
+    { name: "Martin Rodriguez", avatar: "https://i.pravatar.cc/150?u=martin", text: "Atención impecable por WhatsApp. Me asesoraron con el curado y el mate quedó increíble.", rating: 5, time: "hace 3 días" },
+    { name: "Lucia Fernandez", avatar: "https://i.pravatar.cc/150?u=lucia", text: "Compré un termo Stanley y es original 100%. Rapidez y confianza. Mi tienda favorita.", rating: 5, time: "hace 2 meses" },
+    { name: "Gabriel Iturre", avatar: "https://i.pravatar.cc/150?u=gabriel", text: "Diseños únicos. Se nota el trabajo artesanal en cada detalle. Vale cada peso.", rating: 5, time: "hace 1 semana" }
+];
 
 function init() {
     lucide.createIcons();
     renderProducts('Todos');
-
-    // Init 3D Tilt
-    initTilt();
-
-    // Init Scroll Observer
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+    renderReviews();
+    initAnimations();
+    init3DEffects();
+    initCustomCursor();
+    initMagneticButtons();
+    setTimeout(() => ScrollTrigger.refresh(), 500);
 }
 
-function initTilt() {
-    const cards = document.querySelectorAll('.card-nature');
+function initCustomCursor() {
+    const cursor = document.querySelector('.custom-cursor');
+    if (!cursor) return;
+    window.addEventListener('mousemove', e => {
+        gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: "none" });
+    });
+    document.querySelectorAll('button, a, .product-card, .cat-pill, .bento-item, .review-card, .step-card-3d').forEach(el => {
+        el.addEventListener('mouseenter', () => gsap.to(cursor, { scale: 1.5, duration: 0.3 }));
+        el.addEventListener('mouseleave', () => gsap.to(cursor, { scale: 1, duration: 0.3 }));
+    });
+}
 
-    cards.forEach(card => {
+function initAnimations() {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Text & Element reveals
+    document.querySelectorAll('.reveal').forEach((el, i) => {
+        gsap.to(el, {
+            scrollTrigger: { trigger: el, start: "top 95%", toggleActions: "play none none none" },
+            opacity: 1, y: 0, duration: 1.2, ease: "power3.out", delay: i * 0.05
+        });
+    });
+
+    // ONE BY ONE DROP-IN (The "Interactivos que se colocan")
+    document.querySelectorAll('.bento-item').forEach((item, i) => {
+        gsap.to(item, {
+            scrollTrigger: { trigger: item, start: "top 90%", toggleActions: "play none none none" },
+            opacity: 1,
+            y: 0,
+            rotationX: 0,
+            rotationY: 0,
+            scale: 1,
+            duration: 1.5,
+            ease: "expo.out", // Professional settlement
+            delay: (i % 3) * 0.15
+        });
+    });
+
+    // Hero Floating
+    gsap.to(".card-3d", { y: -15, duration: 3, repeat: -1, yoyo: true, ease: "sine.inOut" });
+
+    // Parallax
+    gsap.to("#home h2", {
+        scrollTrigger: { trigger: "#home", start: "top top", end: "bottom top", scrub: 1.5 },
+        x: 350, ease: "none"
+    });
+}
+
+function init3DEffects() {
+    document.querySelectorAll('.card-3d, .product-card, .bento-item, .step-card-3d').forEach(card => {
         card.addEventListener('mousemove', (e) => {
             const rect = card.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
-
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
-
-            const rotateX = ((y - centerY) / centerY) * -5; // Max rotation deg
-            const rotateY = ((x - centerX) / centerX) * 5;
-
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            const rotateX = ((y - centerY) / centerY) * -8;
+            const rotateY = ((x - centerX) / centerX) * 8;
+            gsap.to(card, { rotateX, rotateY, duration: 0.5, ease: "power2.out", transformPerspective: 1000 });
         });
-
         card.addEventListener('mouseleave', () => {
-            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+            gsap.to(card, { rotateX: 0, rotateY: 0, duration: 1, ease: "power3.out" });
         });
     });
 }
 
-function showPage(pageId, btnElement = null) {
-    // 1. Update Nav Buttons
-    // Reset all
-    document.querySelectorAll('.nav-btn').forEach(b => {
-        b.classList.remove('bg-white', 'shadow-sm', 'text-nature-800');
-        b.classList.add('text-nature-600');
-    });
-
-    // Highlight logic
-    if (btnElement) {
-        // Direct click
-        btnElement.classList.remove('text-nature-600');
-        btnElement.classList.add('bg-white', 'shadow-sm', 'text-nature-800');
-    } else {
-        // Programmatic click or scroll spy (future)
-        const navBtns = document.querySelectorAll('.nav-btn');
-        let activeIndex = -1;
-        if (pageId === 'home') activeIndex = 0;
-        else if (pageId === 'servicios') activeIndex = 1;
-        else if (pageId === 'catalogo') activeIndex = 2;
-        else if (pageId === 'nosotros') activeIndex = 3;
-
-        if (activeIndex > -1 && navBtns[activeIndex]) {
-            navBtns[activeIndex].classList.remove('text-nature-600');
-            navBtns[activeIndex].classList.add('bg-white', 'shadow-sm', 'text-nature-800');
-        }
-    }
-
-    // 2. Scroll to Section
-    let targetId = pageId;
-    // Map abstract IDs if needed
-    if (pageId === 'home') targetId = 'home'; // Top
-
-    // For Home, we scroll to top of body or top of container
-    if (pageId === 'home') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-        const el = document.getElementById(targetId);
-        if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    }
-}
-
-function toggleMobileMenu() {
-    const menu = document.getElementById('mobile-menu');
-    menu.classList.toggle('translate-y-full');
-}
-
-function filterAndShow(category) {
-    showPage('catalogo');
-
-    // Small delay to allow page transition
-    setTimeout(() => {
-        const btns = document.querySelectorAll('.cat-btn');
-        btns.forEach(b => {
-            if (b.textContent === category) b.click();
-        });
-    }, 100);
-}
-
-function filterProducts(category, btn) {
-    // Update buttons
-    document.querySelectorAll('.cat-btn').forEach(b => {
-        b.className = 'cat-btn bg-white text-nature-600 px-6 py-2 rounded-full font-bold hover:bg-nature-100 transition-all cursor-pointer';
-    });
-    btn.className = 'cat-btn active bg-nature-800 text-white px-6 py-2 rounded-full font-bold transition-all shadow-md cursor-pointer';
-
-    renderProducts(category);
+function renderReviews() {
+    const container = document.getElementById('reviews-container');
+    if (!container) return;
+    const allReviews = [...reviews, ...reviews];
+    container.innerHTML = allReviews.map(r => `
+        <div class="review-card">
+            <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-4">
+                    <img src="${r.avatar}" class="w-14 h-14 rounded-full object-cover border-2 border-brand-50 shadow-md">
+                    <div class="flex flex-col">
+                        <h4 class="text-base font-bold text-brand-900">${r.name}</h4>
+                        <p class="text-[11px] text-gray-400">${r.time}</p>
+                    </div>
+                </div>
+                <div class="bg-gray-50 p-2 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+                </div>
+            </div>
+            <div class="flex text-yellow-400 mb-3">
+                ${Array(r.rating).fill('<i data-lucide="star" class="fill-current w-4 h-4"></i>').join('')}
+            </div>
+            <p class="text-[14px] text-brand-800 leading-relaxed font-medium italic">"${r.text}"</p>
+            <div class="mt-auto flex items-center gap-2 border-t border-gray-100 pt-4">
+                <div class="flex items-center justify-center w-5 h-5 bg-blue-500 rounded-full shadow-sm">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                </div>
+                <span class="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest">Reseña Verificada</span>
+            </div>
+        </div>
+    `).join('');
+    lucide.createIcons();
 }
 
 function renderProducts(filter) {
     const grid = document.getElementById('product-grid');
+    if (!grid) return;
     const filtered = filter === 'Todos' ? products : products.filter(p => p.category === filter);
-
     grid.innerHTML = filtered.map(p => `
-                <div class="card-nature bg-white p-4 pb-6 flex flex-col relative group transition-all duration-200" style="transform-style: preserve-3d;">
-                    ${p.badge ? `<span class="absolute top-6 left-6 z-20 bg-earth-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm transform translate-z-10">${p.badge}</span>` : ''}
-                    
-                    <div class="h-64 bg-nature-100 rounded-[1.5rem] mb-4 overflow-hidden relative" style="transform: translateZ(20px);">
-                        <img src="${p.image}" class="w-full h-full object-cover transition-transform duration-700" alt="${p.name}">
-                        <button onclick="addToCart()" class="absolute bottom-4 right-4 bg-white text-nature-900 w-10 h-10 rounded-full flex items-center justify-center shadow-lg translate-y-12 group-hover:translate-y-0 transition-transform duration-300 hover:bg-nature-800 hover:text-white z-30">
-                            <i data-lucide="plus" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="px-2" style="transform: translateZ(30px);">
-                        <p class="text-xs text-earth-600 font-bold uppercase mb-1">${p.category}</p>
-                        <h3 class="text-lg font-bold text-nature-900 leading-tight">${p.name}</h3>
-                        <p class="text-nature-600 font-bold mt-2">$${p.price.toLocaleString()}</p>
-                    </div>
+        <div class="product-card group relative bg-white rounded-[2.5rem] p-4 pb-8 transition-all hover:shadow-2xl opacity-0 translate-y-20 shadow-sm border border-brand-100/50" style="transform-style: preserve-3d;">
+            ${p.badge ? `<span class="absolute top-8 left-8 z-20 bg-accent text-white text-[9px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest ">${p.badge}</span>` : ''}
+            <div class="h-64 md:h-80 bg-brand-100/50 rounded-[2rem] mb-6 overflow-hidden relative flex items-center justify-center" style="transform: translateZ(30px);">
+                <img src="${p.image}" class="w-full h-full object-contain p-8 group-hover:scale-110 transition-transform duration-700">
+            </div>
+            <div class="px-4 space-y-2" style="transform: translateZ(50px);">
+                <p class="text-[10px] text-accent font-bold uppercase tracking-widest leading-none">${p.category}</p>
+                <h3 class="text-xl font-serif text-brand-900 leading-tight">${p.name}</h3>
+                <p class="text-[10px] text-brand-400 font-medium">${p.desc}</p>
+                <div class="pt-4 flex justify-between items-center border-t border-brand-100/50 mt-4">
+                    <span class="text-xl font-bold text-brand-900">$${p.price.toLocaleString()}</span>
+                    <a href="https://wa.me/5493880000000?text=Hola! Quiero consultar por el producto: ${p.name}" target="_blank" class="text-[10px] font-bold uppercase tracking-widest text-brand-400 hover:text-accent transition-colors">Consultar</a>
                 </div>
-            `).join('');
-
+            </div>
+        </div>
+    `).join('');
     lucide.createIcons();
-    initTilt(); // Apply tilt to new elements
+    init3DEffects();
+    gsap.to("#product-grid .product-card", { opacity: 1, y: 0, stagger: 0.1, duration: 1, ease: "power2.out" });
 }
 
-function addToCart() {
-    cartCount++;
-    const pill = document.getElementById('cart-pill');
-    pill.style.transform = 'scale(1)';
+function initMagneticButtons() {
+    document.querySelectorAll('.btn-premium, .cat-pill').forEach(btn => {
+        btn.addEventListener('mousemove', e => {
+            const rect = btn.getBoundingClientRect();
+            gsap.to(btn, { x: (e.clientX - rect.left - rect.width / 2) * 0.3, y: (e.clientY - rect.top - rect.height / 2) * 0.3, duration: 0.3 });
+        });
+        btn.addEventListener('mouseleave', () => gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "power3.out" }));
+    });
 }
 
-// Init
+function filterProducts(category, btn) {
+    document.querySelectorAll('.cat-pill').forEach(b => b.classList.replace('bg-brand-900', 'border-brand-200'));
+    btn.classList.replace('border-brand-200', 'bg-brand-900');
+    renderProducts(category);
+}
+
+function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('translate-x-full'); }
+
 document.addEventListener('DOMContentLoaded', init);
+window.addEventListener('resize', () => ScrollTrigger.refresh());
